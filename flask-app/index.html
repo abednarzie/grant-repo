@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grant Tracker</title>
+  <link rel="stylesheet" href="static/css/main.css" />
+</head>
+<body>
+
+  <!-- ── Login screen ── -->
+  <section id="authView" class="auth-view hidden">
+    <div class="auth-card">
+      <h1 class="auth-brand">Grant Tracker</h1>
+      <h2 id="authTitle">Sign in</h2>
+      <form id="authForm" data-mode="signin">
+        <label>Email
+          <input type="email" id="authEmail" autocomplete="email" required />
+        </label>
+        <label>Password
+          <input type="password" id="authPassword" autocomplete="current-password" required minlength="6" />
+        </label>
+        <div class="auth-error hidden" id="authError" role="alert"></div>
+        <button type="submit" class="btn-primary auth-submit" id="authSubmit">Sign in</button>
+      </form>
+      <p class="auth-toggle">
+        <span id="togglePrompt">Need an account?</span>
+        <button type="button" class="btn-link" id="toggleMode">Sign up</button>
+      </p>
+    </div>
+  </section>
+
+  <!-- ── App (shown when signed in) ── -->
+  <div id="appRoot" class="hidden">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <h1>Grant Tracker</h1>
+        <div class="topbar-right">
+          <button class="btn-secondary" id="newActionBtn">+ Action</button>
+          <button class="btn-secondary" id="newAreaBtn">+ Funding Area</button>
+          <button class="btn-primary" id="newOppBtn">+ New Opportunity</button>
+          <span class="user-chip" id="userEmail"></span>
+          <button class="btn-link" id="signOutBtn">Sign out</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+
+      <!-- ── Dashboard view ── -->
+      <section id="dashboardView">
+        <div class="stat-grid" id="statGrid"></div>
+
+        <!-- Targets & Funding Areas -->
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Targets by Funding Area</h2>
+            <div class="overall-target">
+              <span>Overall target:</span>
+              <strong id="overallTargetDisplay">$0</strong>
+              <button class="btn-link" id="editTargetBtn">edit</button>
+            </div>
+          </div>
+          <div class="target-overall" id="targetOverall"></div>
+          <div class="table-wrap">
+            <table class="data-table" id="bucketTable">
+              <thead>
+                <tr>
+                  <th>Funding Area</th>
+                  <th>Target</th>
+                  <th>Awarded</th>
+                  <th>Pipeline</th>
+                  <th>Progress</th>
+                  <th>Grants</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="bucketTableBody"></tbody>
+            </table>
+          </div>
+          <p class="empty-note hidden" id="bucketEmpty">No funding areas yet. Click “+ Funding Area” to create your first bucket.</p>
+        </div>
+
+        <!-- Actions tracker -->
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Action Tracker <span class="req-progress" id="actionProgress"></span></h2>
+            <button class="btn-secondary" id="addActionBtn">+ Add action</button>
+          </div>
+          <div id="actionList" class="action-list"></div>
+          <p class="empty-note hidden" id="actionEmpty">No actions yet. Add general to-dos here.</p>
+        </div>
+
+        <!-- Upcoming deadlines -->
+        <div class="panel">
+          <h2>Upcoming &amp; Overdue Deadlines</h2>
+          <div id="deadlineList" class="deadline-list"></div>
+          <p class="empty-note hidden" id="deadlineEmpty">No upcoming deadlines.</p>
+        </div>
+
+        <!-- Opportunities table -->
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Grant Opportunities</h2>
+            <div class="filter-row">
+              <label for="areaFilter">Area:</label>
+              <select id="areaFilter"><option value="">All areas</option></select>
+              <label for="statusFilter">Status:</label>
+              <select id="statusFilter">
+                <option value="">All statuses</option>
+                <option>Identified</option>
+                <option>Preparing</option>
+                <option>Submitted</option>
+                <option>Awarded</option>
+                <option>Declined</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table" id="oppTable">
+              <thead>
+                <tr>
+                  <th>Opportunity</th>
+                  <th>Funder</th>
+                  <th>Funding Area</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th>Deadline</th>
+                  <th>Requirements</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="oppTableBody"></tbody>
+            </table>
+          </div>
+          <p class="empty-note hidden" id="oppEmpty">No opportunities yet. Click “New Opportunity” to add one.</p>
+        </div>
+      </section>
+
+      <!-- ── Detail view ── -->
+      <section id="detailView" class="hidden">
+        <button class="btn-back" id="backBtn">← Back to dashboard</button>
+        <div class="panel detail-head">
+          <div class="detail-title-row">
+            <h2 id="detailName"></h2>
+            <div class="detail-actions">
+              <button class="btn-secondary" id="editOppBtn">Edit</button>
+              <button class="btn-danger" id="deleteOppBtn">Delete</button>
+            </div>
+          </div>
+          <div class="detail-meta" id="detailMeta"></div>
+          <div class="detail-purpose" id="detailPurpose"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Requirements <span class="req-progress" id="reqProgress"></span></h2>
+            <div class="req-head-actions">
+              <button class="btn-secondary" id="addReqBtn">+ Add requirement</button>
+            </div>
+          </div>
+          <div id="reqList" class="req-list"></div>
+          <p class="empty-note hidden" id="reqEmpty">No requirements yet. Add them with “+ Add requirement”.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ── Opportunity modal ── -->
+  <div class="modal-overlay hidden" id="oppModal">
+    <div class="modal">
+      <h3 id="oppModalTitle">New Opportunity</h3>
+      <form id="oppForm">
+        <input type="hidden" id="oppId" />
+        <label>Grant name *
+          <input type="text" id="f_name" required placeholder="e.g. Community Resilience Fund 2026" />
+        </label>
+        <div class="form-row">
+          <label>Funder
+            <input type="text" id="f_funder" placeholder="e.g. State Arts Council" />
+          </label>
+          <label>Amount aiming for
+            <input type="text" id="f_amount" placeholder="e.g. $50,000" />
+          </label>
+        </div>
+        <div class="form-row">
+          <label>Funding area (bucket)
+            <select id="f_funding_area"><option value="">— None —</option></select>
+          </label>
+          <label>Status
+            <select id="f_status">
+              <option>Identified</option>
+              <option>Preparing</option>
+              <option>Submitted</option>
+              <option>Awarded</option>
+              <option>Declined</option>
+            </select>
+          </label>
+        </div>
+        <label>Specifically funding (detail)
+          <textarea id="f_specifically_funding" rows="2" placeholder="More discrete detail: exactly what within the bucket this grant would fund"></textarea>
+        </label>
+        <label>What we'd use it for
+          <textarea id="f_purpose" rows="2" placeholder="Broader purpose / project this grant would fund"></textarea>
+        </label>
+        <div class="form-row">
+          <label>Source / link
+            <input type="text" id="f_source_url" placeholder="https://…" />
+          </label>
+          <label>Deadline
+            <input type="date" id="f_deadline" />
+          </label>
+        </div>
+        <label>Notes
+          <textarea id="f_notes" rows="2" placeholder="Anything else to remember"></textarea>
+        </label>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" id="oppCancel">Cancel</button>
+          <button type="submit" class="btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── Requirement modal ── -->
+  <div class="modal-overlay hidden" id="reqModal">
+    <div class="modal">
+      <h3 id="reqModalTitle">Add Requirement</h3>
+      <form id="reqForm">
+        <input type="hidden" id="reqId" />
+        <label>What they're asking for *
+          <input type="text" id="r_description" required placeholder="e.g. 501(c)(3) determination letter" />
+        </label>
+        <div class="form-row">
+          <label>Status
+            <select id="r_status">
+              <option>Not started</option>
+              <option>In progress</option>
+              <option>Complete</option>
+              <option>N/A</option>
+            </select>
+          </label>
+          <label>Owner
+            <input type="text" id="r_owner" placeholder="Who's handling it" />
+          </label>
+        </div>
+        <label>Due date
+          <input type="date" id="r_due_date" />
+        </label>
+        <label>Notes
+          <textarea id="r_notes" rows="2"></textarea>
+        </label>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" id="reqCancel">Cancel</button>
+          <button type="submit" class="btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── Action modal ── -->
+  <div class="modal-overlay hidden" id="actionModal">
+    <div class="modal">
+      <h3 id="actionModalTitle">Add Action</h3>
+      <form id="actionForm">
+        <input type="hidden" id="actionId" />
+        <label>Action *
+          <input type="text" id="a_title" required placeholder="e.g. Call program officer about eligibility" />
+        </label>
+        <div class="form-row">
+          <label>Status
+            <select id="a_status">
+              <option>Open</option>
+              <option>In progress</option>
+              <option>Blocked</option>
+              <option>Done</option>
+            </select>
+          </label>
+          <label>Owner
+            <input type="text" id="a_owner" placeholder="Who's handling it" />
+          </label>
+        </div>
+        <label>Due date
+          <input type="date" id="a_due_date" />
+        </label>
+        <label>Notes
+          <textarea id="a_notes" rows="2"></textarea>
+        </label>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" id="actionCancel">Cancel</button>
+          <button type="submit" class="btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── Funding area modal ── -->
+  <div class="modal-overlay hidden" id="areaModal">
+    <div class="modal">
+      <h3 id="areaModalTitle">New Funding Area</h3>
+      <form id="areaForm">
+        <input type="hidden" id="areaId" />
+        <label>Area name *
+          <input type="text" id="fa_name" required placeholder="e.g. Youth Programs" />
+        </label>
+        <label>Target amount
+          <input type="text" id="fa_target" placeholder="e.g. $100,000" />
+        </label>
+        <label>Notes
+          <textarea id="fa_notes" rows="2" placeholder="What this bucket covers"></textarea>
+        </label>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" id="areaCancel">Cancel</button>
+          <button type="submit" class="btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── Overall target modal ── -->
+  <div class="modal-overlay hidden" id="targetModal">
+    <div class="modal modal-sm">
+      <h3>Set Overall Target</h3>
+      <form id="targetForm">
+        <label>Overall fundraising target
+          <input type="text" id="t_target" placeholder="e.g. $500,000" />
+        </label>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" id="targetCancel">Cancel</button>
+          <button type="submit" class="btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast hidden" id="toast"></div>
+
+  <!-- config.js is generated at build time from env vars (gitignored). -->
+  <script src="config.js"></script>
+  <script type="module" src="static/js/main.js"></script>
+</body>
+</html>

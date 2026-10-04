@@ -1,0 +1,10 @@
+{
+  "name": "grant-tracker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Per-user grant opportunity tracker — static frontend on Netlify with a Supabase (Postgres) backend.",
+  "scripts": {
+    "build": "node scripts/build-config.js",
+    "dev": "node scripts/build-config.js && npx --yes serve ."
+  }
+}

@@ -1,0 +1,18 @@
+# Netlify configuration for the Grant Tracker (static site + Supabase).
+#
+# The build step generates config.js from the SUPABASE_URL and SUPABASE_ANON_KEY
+# environment variables you set in Netlify (Site settings → Environment variables).
+# The site itself is plain static files published from the repo root.
+
+[build]
+  command = "node scripts/build-config.js"
+  publish = "."
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Single-page app: everything serves index.html.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
